@@ -41,15 +41,16 @@ MStatus DollyZoomNode::initialize()
     numericAttr.setKeyable(true);
     addAttribute(aCameraHorizontalAperture);
 
-    aOutputFocalLength = numericAttr.create("focalLength", "focalLength", MFnNumericData::kDouble);
-    numericAttr.setWritable(false);
-    numericAttr.setStorable(false);
-    addAttribute(aOutputFocalLength);
 
     aDistance = numericAttr.create("distance", "distance", MFnNumericData::kDouble);
     numericAttr.setWritable(false);
     numericAttr.setStorable(false);
     addAttribute(aDistance);
+
+    aOutputFocalLength = numericAttr.create("focalLength", "focalLength", MFnNumericData::kDouble);
+    numericAttr.setWritable(false);
+    numericAttr.setStorable(false);
+    addAttribute(aOutputFocalLength);
 
     //matrix Attrbituies
 
