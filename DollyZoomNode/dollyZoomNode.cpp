@@ -47,7 +47,6 @@ MStatus DollyZoomNode::initialize()
     addAttribute(aOutputFocalLength);
 
     aDistance = numericAttr.create("distance", "distance", MFnNumericData::kDouble);
-    numericAttr.setDefault(0.001);
     numericAttr.setWritable(false);
     numericAttr.setStorable(false);
     addAttribute(aDistance);
@@ -84,16 +83,10 @@ MStatus DollyZoomNode::compute(const MPlug& plug, MDataBlock& data)
 {
     MStatus status(MS::kSuccess);
 
-    if (plug != aOutputFocalLength || plug != aDistance)
+    if (plug != aOutputFocalLength && plug != aDistance)
     {
         return MS::kUnknownParameter;
     }
-    
-    // get the world matrix of our camera and target. it initializes a MTransformationMatrix for accesing the positions
-
-    MTransformationMatrix cameraWorldMatrix = data.inputValue(aCameraWorldMatrix, &status).asMatrix();
-    MTransformationMatrix targetWorldMatrix = data.inputValue(aTargetWorldMatrix, &status).asMatrix();
-
     double width = data.inputValue(aWidth, &status).asDouble();
 
     if (width <= 0.0)
@@ -107,6 +100,12 @@ MStatus DollyZoomNode::compute(const MPlug& plug, MDataBlock& data)
     {
         cameraAperture= 0.001;
     }
+    
+    // get the world matrix of our camera and target. it initializes a MTransformationMatrix for accesing the positions
+
+    MTransformationMatrix cameraWorldMatrix = data.inputValue(aCameraWorldMatrix, &status).asMatrix();
+    MTransformationMatrix targetWorldMatrix = data.inputValue(aTargetWorldMatrix, &status).asMatrix();
+
 
     //Extracting the  world space position from our matrix and storing it in MPoints to calculate their distance
     MPoint cameraTranslate(cameraWorldMatrix.getTranslation(MSpace::kWorld));
