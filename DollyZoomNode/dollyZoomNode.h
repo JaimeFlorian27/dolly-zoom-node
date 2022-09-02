@@ -26,6 +26,6 @@ public:
 	static MObject aTargetWorldMatrix;
 	static MObject aWidth;
 	static MObject aOutputFocalLength;
-
+	static MObject aDistance;
 
 };
