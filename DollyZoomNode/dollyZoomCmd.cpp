@@ -76,16 +76,16 @@ MStatus DollyZoomCmd::redoIt()
 		  outCameraMatrixPlug, outTargetMatrixPlug;
 
 	//find plugs part of the dolly zoom
-	inCameraMatrixPlug = dollyFn.findPlug("cameraWorldMatrix", &status);
-	inTargetMatrixPlug = dollyFn.findPlug("targetWorldMatrix", &status);
+	inCameraMatrixPlug = dollyFn.findPlug("cameraWorldMatrix",true, &status);
+	inTargetMatrixPlug = dollyFn.findPlug("targetWorldMatrix", true, &status);
 
 	//find plugs part of the camera
 	MFnDependencyNode cameraFn(cameraDagPath.node());
-	outCameraMatrixPlug = cameraFn.findPlug("worldMatrix[0]", &status);
+	outCameraMatrixPlug = cameraFn.findPlug("worldMatrix[0]", true, &status);
 
 	//find plugs part of the camera
 	MFnDependencyNode targetFn(targetDagPath.node());
-	outCameraMatrixPlug = targetFn.findPlug("worldMatrix[0]", &status);
+	outCameraMatrixPlug = targetFn.findPlug("worldMatrix[0]", true, &status);
 
 	MDGModifier dgMod;
 	status = dgMod.connect(outCameraMatrixPlug, inCameraMatrixPlug);
