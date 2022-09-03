@@ -38,6 +38,7 @@ MStatus DollyZoomNode::initialize()
 
 
     aCameraHorizontalAperture = numericAttr.create("horizontalAperture", "horizontalAperture", MFnNumericData::kDouble);
+    numericAttr.setMin(0.0001);
     numericAttr.setDefault(36.0);
     numericAttr.setKeyable(true);
     addAttribute(aCameraHorizontalAperture);

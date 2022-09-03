@@ -89,7 +89,7 @@ MStatus DollyZoomCmd::redoIt()
 	outFocalLenghtPlug = dependNodeFn.findPlug("focalLength", true, &status);
 
 	// horizontal aperture
-	outHorizontalAperturePlug = dependNodeFn.findPlug("horizontalAperture", true, &status);
+	outHorizontalAperturePlug = dependNodeFn.findPlug("outputAperture", true, &status);
 
 	//------------------find plugs part of my kTransforms (camera and target)------------------
 
