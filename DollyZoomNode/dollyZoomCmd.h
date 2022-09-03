@@ -16,10 +16,12 @@ public:
 	virtual ~DollyZoomCmd();
 	static void* creator();
 	virtual MStatus doIt(const MArgList &args); 
-	static bool isUndoable();
+	virtual bool isUndoable() const;
 	virtual MStatus redoIt();
 	virtual MStatus undoIt();
 	static MSyntax newSyntax();
 private:
-	static MSelectionList selectionList;
+	MSelectionList selectionList;
+	MObject nodeObj;
+	MString nodeName;
 };

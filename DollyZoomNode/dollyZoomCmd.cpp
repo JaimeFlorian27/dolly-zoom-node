@@ -1,6 +1,8 @@
 #include "dollyZoomCmd.h"
 
-MSelectionList DollyZoomCmd::selectionList;
+MSelectionList selectionList;
+MObject nodeObj;
+MString nodeName;
 
 DollyZoomCmd::DollyZoomCmd()
 {
@@ -31,7 +33,7 @@ MStatus DollyZoomCmd::doIt(const MArgList& args)
 	return redoIt();
 }
 
-bool DollyZoomCmd::isUndoable()
+bool DollyZoomCmd::isUndoable() const
 {
 	return true;
 }
@@ -68,6 +70,11 @@ MStatus DollyZoomCmd::redoIt()
 	MObject dependNodeObj;
 
 	dependNodeObj = dependNodeFn.create("dollyZoom");
+
+	//store its name
+	nodeObj = MObject(dependNodeObj);
+	nodeName = dependNodeFn.name();
+
 
 	//connect attributes
 
@@ -150,12 +157,28 @@ MStatus DollyZoomCmd::redoIt()
 
 
 	dgMod.doIt();
+
+	//returns the node name as a resunt
+	setResult(nodeName);
+
 	return status;
 }
 
 MStatus DollyZoomCmd::undoIt()
 {
 	MStatus status(MS::kSuccess);
+	/*
+	MString deleteCmd = "delete ";
+
+	deleteCmd += nodeName;
+
+	status = MGlobal::executeCommand(deleteCmd);
+	*/
+	MDGModifier dgMod;
+
+	dgMod.deleteNode(nodeObj);
+	status = dgMod.doIt();
+	
 
 	return status;
 }
