@@ -33,6 +33,11 @@ MStatus DollyZoomCmd::doIt(const MArgList& args)
 	return status;
 }
 
+bool DollyZoomCmd::isUndoable()
+{
+	return true;
+}
+
 MStatus DollyZoomCmd::redoIt()
 {
 	MStatus status;

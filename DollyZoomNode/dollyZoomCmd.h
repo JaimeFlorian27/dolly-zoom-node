@@ -13,6 +13,7 @@ public:
 	virtual ~DollyZoomCmd();
 	static void* creator();
 	static MStatus doIt(const MArgList &args); 
+	static bool isUndoable();
 	static MStatus redoIt();
 	static MStatus undoIt();
 	static MSyntax newSyntax();
