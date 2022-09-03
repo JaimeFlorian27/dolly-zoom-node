@@ -77,16 +77,13 @@ MStatus DollyZoomCmd::redoIt()
 
 	//find plugs part of the dolly zoom 
 	
-	//You cant use findPlug in custom dependency nodes as it not compatible, need to find attribute first instead
 
 
 	// Camera matrix input in dollyZoom
-	MObject attr = dependNodeFn.attribute("cameraWorldMatrix");
-	inCameraMatrixPlug = MPlug(dependNodeObj, attr);
+	inCameraMatrixPlug = dependNodeFn.findPlug("cameraWorldMatrix",true,&status);
 
 	// target matrix input in dollyZoom
-	attr = dependNodeFn.attribute("targetWorldMatrix");
-	inTargetMatrixPlug = MPlug(dependNodeObj, attr);
+	inTargetMatrixPlug = dependNodeFn.findPlug("targetWorldMatrix", true, &status);
 
 	// camera world matrix output from camera transform
 	 dependNodeFn.setObject(cameraDagPath.node());
