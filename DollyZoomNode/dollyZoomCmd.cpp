@@ -47,12 +47,11 @@ MStatus DollyZoomCmd::redoIt()
 	}
 	// retreive dag path
 	MDagPath cameraDagPath, targetDagPath;
-	
 	selectionList.getDagPath(0, cameraDagPath);
 	selectionList.getDagPath(1, targetDagPath);
 
 
-	//check if nodes are transform nodes  -- IF CAMERA IS NOT A KTRANSFORM OR CAMERA SHAPE AND
+	//check if nodes are transform nodes  -- IF CAMERA IS NEITHER A KTRANSFORM OR CAMERA SHAPE AND TARGET IS NOT TRANSFORM
 	if ((!cameraDagPath.node().hasFn(MFn::kTransform) && !cameraDagPath.node().hasFn(MFn::kCamera)) && !targetDagPath.node().hasFn(MFn::kTransform))
 	{
 		status = MS::kFailure;
@@ -72,12 +71,13 @@ MStatus DollyZoomCmd::redoIt()
 
 	//connect attributes
 
-	MPlug inCameraMatrixPlug, inTargetMatrixPlug,
-		  outCameraMatrixPlug, outTargetMatrixPlug;
+	MPlug inCameraMatrixPlug, inTargetMatrixPlug, outFocalLenghtPlug, outHorizontalAperturePlug, //plugs part of the dollyZoom Node
+		  outCameraMatrixPlug, outTargetMatrixPlug, //plugs part of the transform nodes
+	 	  inFocalLenghtPlug, inHorizontalAperturePlug; //plugs part of the camera shape node
 
-	//find plugs part of the dolly zoom 
 	
 
+	//------------------find plugs part of the dolly zoom------------------
 
 	// Camera matrix input in dollyZoom
 	inCameraMatrixPlug = dependNodeFn.findPlug("cameraWorldMatrix",true,&status);
@@ -85,8 +85,26 @@ MStatus DollyZoomCmd::redoIt()
 	// target matrix input in dollyZoom
 	inTargetMatrixPlug = dependNodeFn.findPlug("targetWorldMatrix", true, &status);
 
+	// focal lenght
+	outFocalLenghtPlug = dependNodeFn.findPlug("focalLength", true, &status);
+
+	// horizontal aperture
+	outHorizontalAperturePlug = dependNodeFn.findPlug("horizontalAperture", true, &status);
+
+	//------------------find plugs part of my kTransforms (camera and target)------------------
+
+
+
+	//If the shape node was passed, pop one position( go up one position to to the transform node)
+
+	if (cameraDagPath.node().hasFn(MFn::kCamera)) {
+
+		cameraDagPath.pop(1);
+	}
+	//now cameraDagPath is the transforms dag path
+	dependNodeFn.setObject(cameraDagPath.node());
+
 	// camera world matrix output from camera transform
-	 dependNodeFn.setObject(cameraDagPath.node());
 
 	outCameraMatrixPlug = dependNodeFn.findPlug("worldMatrix",false, &status);
 	outCameraMatrixPlug = outCameraMatrixPlug.elementByLogicalIndex(0, &status); //equivalent to getting item 0 from world matrix array
@@ -98,13 +116,39 @@ MStatus DollyZoomCmd::redoIt()
 	outTargetMatrixPlug = dependNodeFn.findPlug("worldMatrix", false, &status);
 	outTargetMatrixPlug = outTargetMatrixPlug.elementByLogicalIndex(0, &status); //equivalent to getting item 0 from world matrix array
 	
+
+
+	// make the dag path now point to the shape, so when we call node() it will return the shape's MObject
+
+	cameraDagPath.extendToShape();
+
+	dependNodeFn.setObject(cameraDagPath.node());
 	
+	inFocalLenghtPlug = dependNodeFn.findPlug("focalLength", true, &status);
+	inHorizontalAperturePlug =  dependNodeFn.findPlug("horizontalFilmAperture", true, &status);
+
+
+
+	// HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEE ------------------------------------------------------------------------------------------------------------------------------
 
 	MDGModifier dgMod;
+
+	//connect world matrixes to the dolly zoom
 	status = dgMod.connect(outCameraMatrixPlug, inCameraMatrixPlug);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
+
 	status = dgMod.connect(outTargetMatrixPlug, inTargetMatrixPlug);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	//connect focal length and aperture to the camera shape
+
+	status = dgMod.connect(outFocalLenghtPlug, inFocalLenghtPlug);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	status = dgMod.connect(outHorizontalAperturePlug, inHorizontalAperturePlug);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+
 	dgMod.doIt();
 	return status;
 }

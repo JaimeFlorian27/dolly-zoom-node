@@ -83,10 +83,23 @@ MStatus DollyZoomNode::initialize()
 MStatus DollyZoomNode::compute(const MPlug& plug, MDataBlock& data)
 {
     MStatus status(MS::kSuccess);
-
-    if (plug != aOutputFocalLength && plug != aDistance)
+    if (plug != aOutputFocalLength && plug != aDistance && plug != aDistance)
     {
         return MS::kUnknownParameter;
+    }
+    if (plug == aCameraHorizontalAperture)
+    {
+    
+        double aperture = data.inputValue(aCameraHorizontalAperture, &status).asDouble();
+
+        aperture = DollyZoom::milimetetersToinches(aperture);
+
+        MDataHandle hAperture = data.outputValue(aCameraHorizontalAperture, &status);
+        hAperture.setDouble(aperture);
+        hAperture.setClean();
+
+        data.setClean(plug);
+    
     }
     double width = data.inputValue(aWidth, &status).asDouble();
 
