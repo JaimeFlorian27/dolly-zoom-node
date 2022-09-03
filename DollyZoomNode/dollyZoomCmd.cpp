@@ -65,32 +65,50 @@ MStatus DollyZoomCmd::redoIt()
 
 	//create dolly zoom node
 
-	MFnDependencyNode dollyFn;
-	MObject dollyObj;
+	MFnDependencyNode dependNodeFn;
+	MObject dependNodeObj;
 
-	dollyObj = dollyFn.create("dollyZoom");
+	dependNodeObj = dependNodeFn.create("dollyZoom");
 
 	//connect attributes
 
 	MPlug inCameraMatrixPlug, inTargetMatrixPlug,
 		  outCameraMatrixPlug, outTargetMatrixPlug;
 
-	//find plugs part of the dolly zoom
-	inCameraMatrixPlug = dollyFn.findPlug("cameraWorldMatrix",true, &status);
-	inTargetMatrixPlug = dollyFn.findPlug("targetWorldMatrix", true, &status);
+	//find plugs part of the dolly zoom 
+	
+	//You cant use findPlug in custom dependency nodes as it not compatible, need to find attribute first instead
 
-	//find plugs part of the camera
-	MFnDependencyNode cameraFn(cameraDagPath.node());
-	outCameraMatrixPlug = cameraFn.findPlug("worldMatrix[0]", true, &status);
 
-	//find plugs part of the camera
-	MFnDependencyNode targetFn(targetDagPath.node());
-	outCameraMatrixPlug = targetFn.findPlug("worldMatrix[0]", true, &status);
+	// Camera matrix input in dollyZoom
+	MObject attr = dependNodeFn.attribute("cameraWorldMatrix");
+	inCameraMatrixPlug = MPlug(dependNodeObj, attr);
+
+	// target matrix input in dollyZoom
+	attr = dependNodeFn.attribute("targetWorldMatrix");
+	inTargetMatrixPlug = MPlug(dependNodeObj, attr);
+
+	// camera world matrix output from camera transform
+	 dependNodeFn.setObject(cameraDagPath.node());
+
+	outCameraMatrixPlug = dependNodeFn.findPlug("worldMatrix",false, &status);
+	outCameraMatrixPlug = outCameraMatrixPlug.elementByLogicalIndex(0, &status); //equivalent to getting item 0 from world matrix array
+
+	// target world matrix output from target transform
+
+	dependNodeFn.setObject(targetDagPath.node());
+
+	outTargetMatrixPlug = dependNodeFn.findPlug("worldMatrix", false, &status);
+	outTargetMatrixPlug = outTargetMatrixPlug.elementByLogicalIndex(0, &status); //equivalent to getting item 0 from world matrix array
+	
+	
 
 	MDGModifier dgMod;
 	status = dgMod.connect(outCameraMatrixPlug, inCameraMatrixPlug);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
-
+	status = dgMod.connect(outTargetMatrixPlug, inTargetMatrixPlug);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	dgMod.doIt();
 	return status;
 }
 

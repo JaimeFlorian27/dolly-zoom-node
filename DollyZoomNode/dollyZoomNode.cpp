@@ -56,11 +56,11 @@ MStatus DollyZoomNode::initialize()
 
     MFnMatrixAttribute matrixAttr;
 
-    aCameraWorldMatrix = matrixAttr.create("CameraWorldMatrix", "CameraWorldMatrix", MFnMatrixAttribute::kDouble);
+    aCameraWorldMatrix = matrixAttr.create("cameraWorldMatrix", "cameraWorldMatrix", MFnMatrixAttribute::kDouble);
     matrixAttr.setKeyable(true);
     addAttribute(aCameraWorldMatrix);
 
-    aTargetWorldMatrix = matrixAttr.create("TargetWorldMatrix", "TargetWorldMatrix", MFnMatrixAttribute::kDouble);
+    aTargetWorldMatrix = matrixAttr.create("targetWorldMatrix", "targetWorldMatrix", MFnMatrixAttribute::kDouble);
     matrixAttr.setKeyable(true);
     addAttribute(aTargetWorldMatrix);
 
