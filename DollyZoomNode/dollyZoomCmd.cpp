@@ -7,7 +7,16 @@ DollyZoomCmd::~DollyZoomCmd()
 }
 void* DollyZoomCmd::creator()
 {
-	return nullptr;
+	return new DollyZoomCmd();
+}
+
+MSyntax DollyZoomCmd::newSyntax()
+{
+	MSyntax syntax;
+	syntax.addArg(MSyntax::kString);
+	syntax.addArg(MSyntax::kString);
+	syntax.setObjectType(MSyntax::kStringObjects, 2, 2);
+	return syntax;
 }
 MStatus DollyZoomCmd::doIt(const MArgList& args)
 {
