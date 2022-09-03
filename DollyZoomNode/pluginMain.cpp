@@ -9,7 +9,7 @@ MStatus initializePlugin(MObject mObj) {
 
 	status = plugin.registerNode("dollyZoom", DollyZoomNode::id, DollyZoomNode::creator, DollyZoomNode::initialize);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
-	status = plugin.registerCommand("dollyZoom",DollyZoomCmd::creator, DollyZoomCmd::newSyntax);
+	status = plugin.registerCommand("dollyZoom",DollyZoomCmd::creator);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
 
 	return status;
