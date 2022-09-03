@@ -4,6 +4,7 @@
 
 MTypeId DollyZoomNode::id(0x0013b880);
 MObject DollyZoomNode::aCameraHorizontalAperture;
+MObject DollyZoomNode::aOutputAperture;
 MObject DollyZoomNode::aCameraWorldMatrix;
 MObject DollyZoomNode::aTargetWorldMatrix;
 MObject DollyZoomNode::aWidth;
@@ -52,6 +53,11 @@ MStatus DollyZoomNode::initialize()
     numericAttr.setStorable(false);
     addAttribute(aOutputFocalLength);
 
+    aOutputAperture = numericAttr.create("outputAperture", "outputAperture", MFnNumericData::kDouble);
+    numericAttr.setWritable(false);
+    numericAttr.setStorable(false);
+    addAttribute(aOutputAperture);
+
     //matrix Attrbituies
 
     MFnMatrixAttribute matrixAttr;
@@ -65,6 +71,7 @@ MStatus DollyZoomNode::initialize()
     addAttribute(aTargetWorldMatrix);
 
     //dirty propapgation for output focal length
+
     attributeAffects(aCameraHorizontalAperture, aOutputFocalLength);
     attributeAffects(aCameraWorldMatrix, aOutputFocalLength);
     attributeAffects(aTargetWorldMatrix, aOutputFocalLength);
@@ -76,6 +83,8 @@ MStatus DollyZoomNode::initialize()
     attributeAffects(aTargetWorldMatrix, aDistance);
     attributeAffects(aWidth, aDistance);
 
+
+    attributeAffects(aCameraHorizontalAperture, aOutputAperture);
     return status;
 }
 
@@ -83,22 +92,24 @@ MStatus DollyZoomNode::initialize()
 MStatus DollyZoomNode::compute(const MPlug& plug, MDataBlock& data)
 {
     MStatus status(MS::kSuccess);
-    if (plug != aOutputFocalLength && plug != aDistance && plug != aDistance)
+    if (plug != aOutputFocalLength && plug != aDistance && plug != aOutputAperture)
     {
         return MS::kUnknownParameter;
     }
-    if (plug == aCameraHorizontalAperture)
+    if (plug == aOutputAperture)
     {
     
         double aperture = data.inputValue(aCameraHorizontalAperture, &status).asDouble();
 
         aperture = DollyZoom::milimetetersToinches(aperture);
 
-        MDataHandle hAperture = data.outputValue(aCameraHorizontalAperture, &status);
+        MDataHandle hAperture = data.outputValue(aOutputAperture, &status);
         hAperture.setDouble(aperture);
         hAperture.setClean();
 
         data.setClean(plug);
+        
+        return status;
     
     }
     double width = data.inputValue(aWidth, &status).asDouble();
