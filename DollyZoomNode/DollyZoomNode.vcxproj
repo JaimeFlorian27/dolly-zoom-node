@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dollyZoom.cpp" />
+    <ClCompile Include="dollyZoomCmd.cpp" />
     <ClCompile Include="dollyZoomNode.cpp" />
     <ClCompile Include="pluginMain.cpp" />
   </ItemGroup>

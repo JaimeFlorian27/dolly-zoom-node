@@ -5,5 +5,7 @@ class DollyZoomCmd : public MPxCommand
 {
 public:
 	DollyZoomCmd();
-	static MStatus doIt(const MArgList& args);
+	virtual ~DollyZoomCmd();
+	static void* creator();
+	static MStatus doIt(const MArgList &args); 
 };

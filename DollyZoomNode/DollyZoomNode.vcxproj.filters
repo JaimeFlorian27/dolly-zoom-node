@@ -24,6 +24,9 @@
     <ClCompile Include="dollyZoom.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="dollyZoomCmd.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dollyZoomNode.h">

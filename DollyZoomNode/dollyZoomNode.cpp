@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-MTypeId DollyZoomNode::id(0x8000);
+MTypeId DollyZoomNode::id(0x0013b880);
 MObject DollyZoomNode::aCameraHorizontalAperture;
 MObject DollyZoomNode::aCameraWorldMatrix;
 MObject DollyZoomNode::aTargetWorldMatrix;
