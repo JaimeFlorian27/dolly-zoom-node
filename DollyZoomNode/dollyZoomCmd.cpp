@@ -18,6 +18,8 @@ void* DollyZoomCmd::creator()
 MSyntax DollyZoomCmd::newSyntax()
 {	//Define syntax for command (2 arguments needed, camera name and target name)
 	MSyntax syntax;
+	//selected objects can be used as arguments
+	syntax.useSelectionAsDefault(true);
 	syntax.setObjectType(MSyntax::kSelectionList, 2, 2); //return the objects as a selection list
 	return syntax;
 }
@@ -57,12 +59,27 @@ MStatus DollyZoomCmd::redoIt()
 	if ((!cameraDagPath.node().hasFn(MFn::kTransform) && !cameraDagPath.node().hasFn(MFn::kCamera)) && !targetDagPath.node().hasFn(MFn::kTransform))
 	{
 		status = MS::kFailure;
-		CHECK_MSTATUS_AND_RETURN_IT(status);
-		
-		//TO-DO : implement error message
+		MString msg("the provided arguments are invalid");
+		displayError(msg);
+		return status;
 
 
 	}
+	
+	//check is children is a camera
+	if (cameraDagPath.node().hasFn(MFn::kTransform))
+	{
+		cameraDagPath.extendToShape();	// IMPORTANT -- From here on, we are storing the dagPath of the cameraShape, regardless if a transform was passed
+		if (!cameraDagPath.node().hasFn(MFn::kCamera)) 
+		{
+			status = MS::kFailure;
+			MString msg("the first argument provided is not a camera ");
+			displayError(msg);
+			return status;
+		}
+	}
+
+
 
 	//create dolly zoom node
 
@@ -98,16 +115,24 @@ MStatus DollyZoomCmd::redoIt()
 	// horizontal aperture
 	outHorizontalAperturePlug = dependNodeFn.findPlug("outputAperture", true, &status);
 
+
+	
+	//------------------find plugs part of my cameraShape (camera and target)------------------
+
+	dependNodeFn.setObject(cameraDagPath.node());
+	
+	inFocalLenghtPlug = dependNodeFn.findPlug("focalLength", true, &status);
+	inHorizontalAperturePlug =  dependNodeFn.findPlug("horizontalFilmAperture", true, &status);
+
+
+
 	//------------------find plugs part of my kTransforms (camera and target)------------------
+	
 
+	
+	//We have been using the camera shape dag path, we now pop 1 (go one dag path up) so we can access the transform node
+	cameraDagPath.pop(1);
 
-
-	//If the shape node was passed, pop one position( go up one position to to the transform node)
-
-	if (cameraDagPath.node().hasFn(MFn::kCamera)) {
-
-		cameraDagPath.pop(1);
-	}
 	//now cameraDagPath is the transforms dag path
 	dependNodeFn.setObject(cameraDagPath.node());
 
@@ -125,18 +150,9 @@ MStatus DollyZoomCmd::redoIt()
 	
 
 
-	// make the dag path now point to the shape, so when we call node() it will return the shape's MObject
-
-	cameraDagPath.extendToShape();
-
-	dependNodeFn.setObject(cameraDagPath.node());
-	
-	inFocalLenghtPlug = dependNodeFn.findPlug("focalLength", true, &status);
-	inHorizontalAperturePlug =  dependNodeFn.findPlug("horizontalFilmAperture", true, &status);
 
 
-
-	// HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEE ------------------------------------------------------------------------------------------------------------------------------
+	// -----Connect all the plugs-----
 
 	MDGModifier dgMod;
 
@@ -162,18 +178,11 @@ MStatus DollyZoomCmd::redoIt()
 	setResult(nodeName);
 
 	return status;
-}
+} 
 
 MStatus DollyZoomCmd::undoIt()
 {
 	MStatus status(MS::kSuccess);
-	/*
-	MString deleteCmd = "delete ";
-
-	deleteCmd += nodeName;
-
-	status = MGlobal::executeCommand(deleteCmd);
-	*/
 	MDGModifier dgMod;
 
 	dgMod.deleteNode(nodeObj);
